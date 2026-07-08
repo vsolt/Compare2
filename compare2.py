@@ -89,16 +89,18 @@ class SheetRange(object):
 
     def norm(self,value):
         ''' Нормалізує подане значення:
+        - 
         - приводить до символьного вигляду, якщо це число.
         - (мождиво знадобиться ще щось, наприклад очистка від пробілів чи приведення до одного регістру)
         Повертає нормалізоване значення
         '''
         print ('--norm value type:',type(value))
-        print ('--norm value "%s"' % value)
-        if type(value) == str:
-            res = value
-        else:
-            res = str(value)
+        res = value
+        if type(res) == float:
+            res = int(res)
+        if not type(res) == str:
+            res = str(res)
+        print ('--norm res:',value,type(res))
         return res
 
 
