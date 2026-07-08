@@ -9,7 +9,6 @@ import utl
 ver = "0.0"
 
 
-#lines = None   # -- Обмеження числа зчитуваних рядків (для відладки)
 args = None  # -- Для збереження оргументів командного рядка глобально
 
 
@@ -32,22 +31,27 @@ class SheetRange(object):
     '''
     def __init__(self,sheet,bg_arg,maxlines=None):
         ''' Задає координати першої точки
-        bg_arg  - рядок з аргументами з даними про початок області порівняння.
-        Наприклад, А3 (одна колонка)  cd3 (дві колонки)
+        bg_arg  - рядок з аргументами з даними про початок області
+        порівняння. Наприклад, А3 (одна колонка)  cd3 (дві колонки)
+        maxlines - обмеження числа рядків (для відладки)
         '''
         self.sheet = sheet
-        self.bg_arg = bg_arg
-        self.bg = utl.get_range_bg(bg_arg) # [rov1,coli1,coli2]
-
+        self.bg_arg = bg_arg # -- 
+        print('--Range bg_arg:',bg_arg)
+        self.bg = utl.get_range_bg(bg_arg) # [row_index,col_index]
+        print ('Range row,col:',self.bg)
+        self.first_row = self.bg[0]  # -- індексний номер першого рядка
+        
+        
         if maxlines:
             self.maxlines = int(maxlines)          # -- обмеження числа зчитуваних рядків
         else:
             self.maxlines = None
             
-        bg = self.bg
+        #bg = self.bg
 
-        self.first_row = bg[0]  # -- індексний номер першого рядка
-        self.cols = bg[1:]      # -- індексні номери задіяних колонок
+
+        self.cols = self.bg[1:]      # -- індексні номери задіяних колонок
         print ('cols:',self.cols)
 
         self.end_row = self.sheet.nrows  # -- Індекс на одиницю більший за індекс останнього рядка
@@ -61,15 +65,22 @@ class SheetRange(object):
         Повертає побудований словник.
         '''
         res = {}
-        nrows = 0
+        count = 0 # -- лічильник для обмеження числа рядків
         for nrow in range(self.first_row,self.end_row):
+            
             row = self.sheet.row_values(nrow)
-            # Формуємо зведене значення колонок
-            nval = self.get_cols_value(row,self.cols) # -- отримує приведене значення
-            #print nrow,nval
-            res[nval] = nrow
-            nrows += 1
-            if self.maxlines and nrows > self.maxlines:
+            
+            # Формуємо зведене значення колонок  ***
+            key = self.get_cols_value(row,self.cols) # -- отримує приведене значення
+            print ('rownum,key,value:',nrow,key,nrow)
+            
+            # -- Якщо ключ вже існує, дописуємо номер рядка
+            if not key in res:
+                res[key] = [nrow]
+            else:
+                res[key].append(nrow)
+            count += 1
+            if self.maxlines and count > self.maxlines:
                 break
                 
         return res
@@ -94,21 +105,21 @@ class SheetRange(object):
         - (мождиво знадобиться ще щось, наприклад очистка від пробілів чи приведення до одного регістру)
         Повертає нормалізоване значення
         '''
-        print ('--norm value type:',type(value))
+        #print ('--norm value type:',type(value))
         res = value
         if type(res) == float:
             res = int(res)
         if not type(res) == str:
             res = str(res)
-        print ('--norm res:',value,type(res))
+        # print ('--norm res:',res,type(res))
         return res
 
 
     def dump(self):
         ''' Виводить дані
         '''
-        print (" -- Range input argument:",self.bg_arg)
-        print ("-- bg:",self.bg)
+        print (" -- Command argument:",self.bg_arg)
+        print ("-- First row index:",self.bg)
         print ("cols",self.cols)
         print ("--end row_i:",self.end_row)
         print ("--first row:", self.first_row)
