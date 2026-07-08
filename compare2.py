@@ -3,9 +3,16 @@ import argparse
 #import pyexcel as pe
 import xlrd
 import xlsxwriter
+import types
 import utl
 
 ver = "0.0"
+
+
+#lines = None   # -- Обмеження числа зчитуваних рядків (для відладки)
+args = None  # -- Для збереження оргументів командного рядка глобально
+
+
 
 def validate_args(file1,file2):
     ''' Перевірка наявності вказаних файлів.
@@ -23,37 +30,48 @@ def validate_args(file1,file2):
 class SheetRange(object):
     ''' Містить дані про діапазон клітинок ексель-файла
     '''
-    def __init__(self,sheet,bg_arg):
+    def __init__(self,sheet,bg_arg,maxlines=None):
         ''' Задає координати першої точки
         bg_arg  - рядок з аргументами з даними про початок області порівняння.
         Наприклад, А3 (одна колонка)  cd3 (дві колонки)
         '''
+        self.sheet = sheet
         self.bg_arg = bg_arg
         self.bg = utl.get_range_bg(bg_arg) # [rov1,coli1,coli2]
+
+        if maxlines:
+            self.maxlines = int(maxlines)          # -- обмеження числа зчитуваних рядків
+        else:
+            self.maxlines = None
+            
         bg = self.bg
 
-        self.sheet = sheet
         self.first_row = bg[0]  # -- індексний номер першого рядка
         self.cols = bg[1:]      # -- індексні номери задіяних колонок
-        self.ncols = len(self.cols) # -- чисо колонок
+        print ('cols:',self.cols)
 
         self.end_row = self.sheet.nrows  # -- Індекс на одиницю більший за індекс останнього рядка
-        #print "--ncols:",
+        print ('end row:',self.end_row)
 
 
     def get_dict(self):
-        ''' Будує словник значень для діапазона.
-            Ключ - величина, скомбінована із значень задіяних колонок рядка.
+        ''' Будує словник значень для діапазона (з врахуванням обмежень).
+            Ключ - пошуковий рядок.
             Значення - номер рядка.
         Повертає побудований словник.
         '''
         res = {}
+        nrows = 0
         for nrow in range(self.first_row,self.end_row):
             row = self.sheet.row_values(nrow)
             # Формуємо зведене значення колонок
             nval = self.get_cols_value(row,self.cols) # -- отримує приведене значення
             #print nrow,nval
             res[nval] = nrow
+            nrows += 1
+            if self.maxlines and nrows > self.maxlines:
+                break
+                
         return res
 
 
@@ -75,9 +93,9 @@ class SheetRange(object):
         - (мождиво знадобиться ще щось, наприклад очистка від пробілів чи приведення до одного регістру)
         Повертає нормалізоване значення
         '''
-        #print '--norm value type:',type(value)
-        #print '--norm value "%s"' % value
-        if type(value) == types.UnicodeType:
+        print ('--norm value type:',type(value))
+        print ('--norm value "%s"' % value)
+        if type(value) == str:
             res = value
         else:
             res = str(value)
@@ -87,7 +105,7 @@ class SheetRange(object):
     def dump(self):
         ''' Виводить дані
         '''
-        print (" -- Range bg_arg:",self.bg_arg)
+        print (" -- Range input argument:",self.bg_arg)
         print ("-- bg:",self.bg)
         print ("cols",self.cols)
         print ("--end row_i:",self.end_row)
@@ -98,16 +116,18 @@ class SheetRange(object):
 
 
 
-def main(file1,file2,bg1,bg2):
+def main(file1,file2,bg1,bg2,args):
     ''' Обробка двох файлів.
     file1,file2 : назви першого та другого файла
     bg1 : Назва колонки або координата першої клітинки для порівняння у першому файлі - наприклад A або A2
     bg2 : Те ж для другого файла
+    args: Об'єкт розбору аргументів  командного рядка
    
     '''
+
     validate_args(file1,file2)
     # -- Зчитуємо обидва ексель файли
-
+    
     
     wb1 = xlrd.open_workbook(file1)
     sheet1 = wb1.sheet_by_index(0)
@@ -121,22 +141,30 @@ def main(file1,file2,bg1,bg2):
 
     # -- Створюємо дескриптори діапазонів для кожного листа
 
-    range1 = SheetRange(sheet1,bg1)
-    range2 = SheetRange(sheet2,bg2)
+    range1 = SheetRange(sheet1,bg1,args.lines)
+    range2 = SheetRange(sheet2,bg2,args.lines)
 
+    # -- Побудова словників
+    d1 = range1.get_dict()
+    d2 = range2.get_dict()
 
+    print ('--Dict1:',d1)
+    print ('--Dict2:',d2)
     
+    # Дивимось результат
+    range1.dump()
     
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Порівнює вказані колонки із двох ексель файлів та видає результат у залежності від режиму порівняння')
+    parser = argparse.ArgumentParser(description='Порівнює вказані колонки із дв ох ексель файлів та видає результат у залежності від режиму порівняння')
     parser.add_argument("file_1_name",help="Перший файл")
     parser.add_argument("file_2_name",help="Другий файл")
     parser.add_argument("col_file_1",help="Початкова клітинка першого файла") 
     parser.add_argument("col_file_2",help="Початкова клітинка другого файла")  
 
-    # arser.add_argument("-l","--lines",help="Обмеження числа зчитуваних рядків вхідого файла")
+    parser.add_argument("-l","--lines",help="Обмеження числа зчитуваних рядків вхідних файлів")
+    
     args = parser.parse_args()
 
 
@@ -156,7 +184,7 @@ if __name__ == '__main__':
 
 
     
-    main(file_1,file_2,bg1,bg2)
+    main(file_1,file_2,bg1,bg2,args)
     
 
 
