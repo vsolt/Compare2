@@ -5,6 +5,7 @@ import xlrd
 import xlsxwriter
 import types
 import utl
+import result
 
 ver = "0.0"
 
@@ -48,9 +49,6 @@ class SheetRange(object):
         else:
             self.maxlines = None
             
-        #bg = self.bg
-
-
         self.cols = self.bg[1:]      # -- індексні номери задіяних колонок
         print ('cols:',self.cols)
 
@@ -87,9 +85,9 @@ class SheetRange(object):
 
 
     def get_cols_value(self,row,ncols):
-        ''' Формує спільне значення з кількох кологок.
+        ''' Формує спільне значення з кількох колонок.  ***
         row - список значень рядка
-        ncols - номоери задіяних колонок
+        ncols - номомери задіяних колонок
         '''
         res = ''
         for ncol in ncols:
@@ -157,7 +155,7 @@ def main(file1,file2,bg1,bg2,args):
     range1 = SheetRange(sheet1,bg1,args.lines)
     range2 = SheetRange(sheet2,bg2,args.lines)
 
-    # -- Побудова словників
+    # -- Побудова словників з індексами
     d1 = range1.get_dict()
     d2 = range2.get_dict()
 
@@ -166,7 +164,46 @@ def main(file1,file2,bg1,bg2,args):
     
     # Дивимось результат
     range1.dump()
-    
+
+    # -- Пошук відсутніх у другому
+    absent2 = utl.get_absent(d1,d2)  # -- Список номерів відсутніх рядків
+    print ('absent2:',absent2)
+
+    # -- Пошук у першому
+    absent1 = utl.get_absent(d2,d1)
+    print ('absent1:',absent1)
+
+    # -- Пошук спільних для обох файлів
+    common = utl.get_common(d1,d2)
+    print('Common:',common)
+
+    # -- Побудова результату
+    '''
+    1. Створити workbook
+    2. Створити sheet
+    3. Переписати заголовок із базового sheeh
+    4. Виписати рядки із базового sheet
+
+    '''
+    exgen = result.ExcelGen(range1,range2)
+
+    # -- Пишемо рядки, виписані із першого файла
+    exgen.add_sheet_rows(sheet1,0,absent2)
+    #print 'Відсутніх у другому файлі:',len(absent2)
+    console (u'Відсутніх у другому файлі:%s' % len(absent2))
+
+    # -- Пишемо рядки, виписані із другого файла
+    exgen.add_sheet_rows(sheet2,1,absent1)
+    console(u'Відсутніх у першму файлі:%s' % len(absent1))
+
+    # -- Виписуємо спільні рядки
+    exgen.add_sheet_rows(sheet1,2,common)
+    console(u'Присутніх у обох файлах:%s' % len(common))
+
+    exgen.save('out.xls')
+
+    print ("saved")
+
 
 if __name__ == '__main__':
 
