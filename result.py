@@ -66,8 +66,10 @@ class ExcelGen(object):
 
     def add_sheet_rows(self,base_sheet,sheet_i,irows):
         ''' Переписує у вказаний sheet рядки із base_sheet.
-        irows - список індексів рядків із base_sheet
-        sheet_i - індекс sheet
+        base_sheet : звідки виписувати
+        sheet_i - індекс цільового sheet (у який писати)
+        irows - список індексів рядків із base_sheet які виписати у sheet_i
+        
         Міняє дані лічильника рядків відповідного sheet
         '''
         print ("--add rows to sheet:",sheet_i,len(irows))

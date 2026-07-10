@@ -58,7 +58,8 @@ class SheetRange(object):
         
         
         if maxlines:
-            self.maxlines = int(maxlines)          # -- обмеження числа зчитуваних рядків
+            #self.maxlines = int(maxlines)          # -- обмеження числа зчитуваних рядків
+            self.maxindex = int(maxlines) -1    # -- Максимальний індекс зчитуваного рядка
         else:
             self.maxlines = None
             
@@ -91,7 +92,7 @@ class SheetRange(object):
             else:
                 res[key].append(nrow)
             count += 1
-            if self.maxlines and count > self.maxlines:
+            if self.maxindex >= 0 and count > self.maxindex:
                 break
                 
         return res
@@ -186,10 +187,18 @@ def main(file1,file2,bg1,bg2,args):
     absent1 = utl.get_absent(d2,d1)
     print ('absent1:',absent1)
 
-    # -- Пошук спільних для обох файлів
-    common = utl.get_common(d1,d2)
-    print('Common:',common)
+    # -- Виписка номерів рядків першого файла ключі яких є у другому файлі
+    common1 = utl.get_common(d1,d2)
+    print('Common1:',common1)
 
+    # -- Виписка номерів рядків другого файла ключі яких є у першому файлі
+    common2 = utl.get_common(d2,d1)
+    print('Common2:',common2)
+
+    
+
+
+    
     # -- Побудова результату
     '''
     1. Створити workbook
@@ -200,9 +209,8 @@ def main(file1,file2,bg1,bg2,args):
     '''
     exgen = result.ExcelGen(range1,range2)
 
-    # -- Пишемо рядки, виписані із першого файла
+    # -- Пишемо рядки з першого файла, ключів яких нема у другому файлі
     exgen.add_sheet_rows(sheet1,0,absent2)
-    #print 'Відсутніх у другому файлі:',len(absent2)
     console (u'Відсутніх у другому файлі:%s' % len(absent2))
     
 
@@ -210,9 +218,9 @@ def main(file1,file2,bg1,bg2,args):
     exgen.add_sheet_rows(sheet2,1,absent1)
     console(u'Відсутніх у першму файлі:%s' % len(absent1))
 
-    # -- Виписуємо спільні рядки
-    exgen.add_sheet_rows(sheet1,2,common)
-    console(u'Присутніх у обох файлах:%s' % len(common))
+    # -- Виписуємо  рядки другого файла знайдені за ключами першого файла
+    exgen.add_sheet_rows(sheet1,2,common1)
+    console(u'Присутніх у обох файлах:%s' % len(common1))
 
     exgen.save('out.xls')
 
