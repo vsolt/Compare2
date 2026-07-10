@@ -12,6 +12,19 @@ ver = "0.0"
 
 args = None  # -- Для збереження оргументів командного рядка глобально
 
+def console(utf_message):
+    ''' Друкує на консоль повідомлення. Якщо програма виконуєтьсяу віндовсі,
+    спочатку перекодовує у CP866 (з укр-i корекцією)
+    utf_message : Рядок у кодуванні utf-8
+    ver-0.1
+    '''
+    if os.name == 'nt':
+        res = utf_message.replace(u'і',u'i')
+        res = res.replace(u'І',u'I')
+        res = res.encode('cp866')
+    else:
+        res = utf_message
+    print (res)
 
 
 def validate_args(file1,file2):
@@ -191,6 +204,7 @@ def main(file1,file2,bg1,bg2,args):
     exgen.add_sheet_rows(sheet1,0,absent2)
     #print 'Відсутніх у другому файлі:',len(absent2)
     console (u'Відсутніх у другому файлі:%s' % len(absent2))
+    
 
     # -- Пишемо рядки, виписані із другого файла
     exgen.add_sheet_rows(sheet2,1,absent1)
