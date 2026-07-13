@@ -58,8 +58,7 @@ class SheetRange(object):
         
         
         if maxlines:
-            #self.maxlines = int(maxlines)          # -- обмеження числа зчитуваних рядків
-            self.maxindex = int(maxlines) -1    # -- Максимальний індекс зчитуваного рядка
+             self.maxindex = int(maxlines) -1    # -- Максимальний індекс зчитуваного рядка
         else:
             self.maxlines = None
             
