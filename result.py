@@ -20,6 +20,9 @@ class ExcelGen(object):
         self.sheet1 = self.wb.add_sheet(u'Відсутні у 2')
         self.sheet2 = self.wb.add_sheet(u'Відсутні у 1')
         self.sheet3 = self.wb.add_sheet(u'Присутні у 1 та 2')
+        self.sheet4 = self.wb.add_sheet(u'Спільні у 1')
+        self.sheet5 = self.wb.add_sheet(u'Спільні у 2')
+        
 
         hr1 = self.add_sheet_header(self.sheet1,range1)
         hr2 = self.add_sheet_header(self.sheet2,range2)
