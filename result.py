@@ -15,33 +15,36 @@ class ExcelGen(object):
         Всі потрібні дані бере із range
         '''
         self.wb = xlwt.Workbook()
-        #self.sheet1 = self.wb.add_sheet('List1')
-        #self.sheet2 = self.wb.add_sheet('List2')
         self.sheet1 = self.wb.add_sheet(u'Відсутні у 2')
         self.sheet2 = self.wb.add_sheet(u'Відсутні у 1')
-        self.sheet3 = self.wb.add_sheet(u'Присутні у 1 та 2')
-        self.sheet4 = self.wb.add_sheet(u'Спільні у 1')
-        self.sheet5 = self.wb.add_sheet(u'Спільні у 2')
+        #self.sheet3 = self.wb.add_sheet(u'Присутні у 1 та 2')
+        self.sheet3 = self.wb.add_sheet(u'Спільні у 1')
+        self.sheet4 = self.wb.add_sheet(u'Спільні у 2')
         
 
         hr1 = self.add_sheet_header(self.sheet1,range1)
         hr2 = self.add_sheet_header(self.sheet2,range2)
-        hr3 = self.add_sheet_header(self.sheet3,range1)
+        hr3 = self.add_sheet_header(self.sheet1,range1)
+        hr4 = self.add_sheet_header(self.sheet2,range2)
+        
         self.next_row1 = hr1 + 1
         self.next_row2 = hr2 + 1
         self.next_row3 = hr3 + 1
+        self.next_row4 = hr4 + 1
+                
         self.sheets = []
         self.sheets.append(self.sheet1)
         self.sheets.append(self.sheet2)
         self.sheets.append(self.sheet3)
         self.sheets.append(self.sheet4)
-        self.sheets.append(self.sheet5)
+
 
 
         self.row_cnts = []
         self.row_cnts.append(self.next_row1)
         self.row_cnts.append(self.next_row2)
         self.row_cnts.append(self.next_row3)
+        self.row_cnts.append(self.next_row4)
 
     def add_sheet_header(self,sheet,s_range):
         ''' Виписує заголовок у заданий sheet
@@ -69,19 +72,31 @@ class ExcelGen(object):
         for coli in range(len(row)):
             sheet.write(rowi,coli,row[coli])
 
-    def add_sheet_rows(self,base_sheet,sheet_i,irows):
+    def add_sheet_rows(self,base_sheet,sheet_i,row_lists):
         ''' Переписує у вказаний sheet рядки із base_sheet.
         base_sheet : звідки виписувати
         sheet_i - індекс цільового sheet (у який писати)
-        irows - список індексів рядків із base_sheet які виписати у sheet_i
+        row_lists - список списків індексів рядків із base_sheet які виписати у sheet_i
+                  Наприклад [[0],[5,7],...]
         
         Міняє дані лічильника рядків відповідного sheet
         '''
-        print ("--add rows to sheet:",sheet_i,len(irows))
+
+        # Виписуємо індекси рядків у один список
+        #irows = []
+        #for rowlist in row_lists:
+        #    for row in rowlist:
+        #        irows.append(row)
+
+        irows = row_lists         #  ---- *****    
+        print ("--add rows to sheet:",sheet_i,len(row_lists))
         print ('--n_sheets:',len(self.sheets))
+        print ('--row_lists',row_lists)
         print ('irows:',irows)
-        sheet = self.sheets[sheet_i]  # -- Куди писати
+        
+        sheet = self.sheets[sheet_i]      # -- Куди писати
         row_cnt = self.row_cnts[sheet_i]  # -- У який рядок писати
+        
         for irow in irows:
             self.write_sheet_row(irow,base_sheet,sheet,row_cnt)
             row_cnt += 1

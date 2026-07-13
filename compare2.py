@@ -193,9 +193,7 @@ def main(file1,file2,bg1,bg2,args):
 
     # -- Виписка номерів рядків другого файла ключі яких є у першому файлі
     common2 = utl.get_common(d2,d1)
-    print('Common2:',common2)
-
-    
+    print('Common2:',common2)    
 
 
     
@@ -210,17 +208,25 @@ def main(file1,file2,bg1,bg2,args):
     exgen = result.ExcelGen(range1,range2)
 
     # -- Пишемо рядки з першого файла, ключів яких нема у другому файлі
-    exgen.add_sheet_rows(sheet1,0,absent2)
     console (u'Відсутніх у другому файлі:%s' % len(absent2))
+    exgen.add_sheet_rows(sheet1,0,absent2)
+
     
 
     # -- Пишемо рядки, виписані із другого файла
     exgen.add_sheet_rows(sheet2,1,absent1)
     console(u'Відсутніх у першму файлі:%s' % len(absent1))
 
-    # -- Виписуємо  рядки другого файла знайдені за ключами першого файла
-    exgen.add_sheet_rows(sheet1,2,common1)
+    # -- Виписуємо  рядки першого файла знайдені за ключами друго файла
     console(u'Присутніх у обох файлах:%s' % len(common1))
+    exgen.add_sheet_rows(sheet1,2,common1)
+
+    # -- Виписуємо  рядки другого файла знайдені за ключами першого файла
+    console(u'Присутніх у обох файлах:%s' % len(common2))    
+    exgen.add_sheet_rows(sheet2,3,common2)
+
+    # -- Виписуємо рядки першого файла спільні наявними ключами к 2му
+    
 
     exgen.save('out.xls')
 
