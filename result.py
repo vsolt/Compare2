@@ -34,6 +34,8 @@ class ExcelGen(object):
         self.sheets.append(self.sheet1)
         self.sheets.append(self.sheet2)
         self.sheets.append(self.sheet3)
+        self.sheets.append(self.sheet4)
+        self.sheets.append(self.sheet5)
 
 
         self.row_cnts = []
