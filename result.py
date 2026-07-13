@@ -72,23 +72,25 @@ class ExcelGen(object):
         for coli in range(len(row)):
             sheet.write(rowi,coli,row[coli])
 
-    def add_sheet_rows(self,base_sheet,sheet_i,row_lists):
+    def add_sheet_rows(self,base_sheet,sheet_i,row_lists,rep=False):
         ''' Переписує у вказаний sheet рядки із base_sheet.
         base_sheet : звідки виписувати
         sheet_i - індекс цільового sheet (у який писати)
         row_lists - список списків індексів рядків із base_sheet які виписати у sheet_i
                   Наприклад [[0],[5,7],...]
-        
+        rep : True коли потрібно виводити рядки з додатковими індексами
         Міняє дані лічильника рядків відповідного sheet
         '''
 
-        # Виписуємо індекси рядків у один список
-        #irows = []
-        #for rowlist in row_lists:
-        #    for row in rowlist:
-        #        irows.append(row)
-
-        irows = row_lists         #  ---- *****    
+        # Для задіяння додаткових рядків виписуємо вкдені індекси у один список
+        if rep:  # -- Друк дадаткових записів для індекса
+            irows = []
+            for rowlist in row_lists:
+                for row in rowlist:
+                    irows.append([row])
+        else:
+            irows = row_lists         #  ---- *****
+            
         print ("--add rows to sheet:",sheet_i,len(row_lists))
         print ('--n_sheets:',len(self.sheets))
         print ('--row_lists',row_lists)
