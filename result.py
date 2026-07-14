@@ -17,7 +17,6 @@ class ExcelGen(object):
         self.wb = xlwt.Workbook()
         self.sheet1 = self.wb.add_sheet(u'Відсутні у 2')
         self.sheet2 = self.wb.add_sheet(u'Відсутні у 1')
-        #self.sheet3 = self.wb.add_sheet(u'Присутні у 1 та 2')
         self.sheet3 = self.wb.add_sheet(u'Спільні у 1')
         self.sheet4 = self.wb.add_sheet(u'Спільні у 2')
         
@@ -91,10 +90,10 @@ class ExcelGen(object):
         else:
             irows = row_lists         #  ---- *****
             
-        print ("--add rows to sheet:",sheet_i,len(row_lists))
-        print ('--n_sheets:',len(self.sheets))
-        print ('--row_lists',row_lists)
-        print ('irows:',irows)
+        #print ("--add rows to sheet:",sheet_i,len(row_lists))
+        #print ('--n_sheets:',len(self.sheets))
+        #print ('--row_lists',row_lists)
+        #print ('irows:',irows)
         
         sheet = self.sheets[sheet_i]      # -- Куди писати
         row_cnt = self.row_cnts[sheet_i]  # -- У який рядок писати
@@ -110,11 +109,10 @@ class ExcelGen(object):
         row_cnt : у який рядок писати
         '''
         row_i = row_list[0]
-        print('write sheet row:',row_i)
+        #print('write sheet row:',row_i)
         row = base_sheet.row_values(row_i)
         for coli in range(len(row)):
-            #cell = row[coli]
-            sheet.write(row_cnt,coli,row[coli])
+             sheet.write(row_cnt,coli,row[coli])
 
 
 

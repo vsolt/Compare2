@@ -51,22 +51,22 @@ class SheetRange(object):
         '''
         self.sheet = sheet
         self.bg_arg = bg_arg # -- 
-        print('--Range bg_arg:',bg_arg)
+        #print('--Range bg_arg:',bg_arg)
         self.bg = utl.get_range_bg(bg_arg) # [row_index,col_index]
-        print ('Range row,col:',self.bg)
+        #print ('Range row,col:',self.bg)
         self.first_row = self.bg[0]  # -- індексний номер першого рядка
         
         
         if maxlines:
              self.maxindex = int(maxlines) -1    # -- Максимальний індекс зчитуваного рядка
         else:
-            self.maxlines = None
+            self.maxindex = None
             
         self.cols = self.bg[1:]      # -- індексні номери задіяних колонок
-        print ('cols:',self.cols)
+        #print ('cols:',self.cols)
 
         self.end_row = self.sheet.nrows  # -- Індекс на одиницю більший за індекс останнього рядка
-        print ('end row:',self.end_row)
+        #print ('end row:',self.end_row)
 
 
     def get_dict(self):
@@ -83,7 +83,7 @@ class SheetRange(object):
             
             # Формуємо зведене значення колонок  ***
             key = self.get_cols_value(row,self.cols) # -- отримує приведене значення
-            print ('rownum,key,value:',nrow,key,nrow)
+            #print ('rownum,key,value:',nrow,key,nrow)
             
             # -- Якщо ключ вже існує, дописуємо номер рядка
             if not key in res:
@@ -91,7 +91,9 @@ class SheetRange(object):
             else:
                 res[key].append(nrow)
             count += 1
-            if self.maxindex >= 0 and count > self.maxindex:
+            
+            #if self.maxindex >= 0 and count > self.maxindex:
+            if not self.maxindex is None  and count > self.maxindex:
                 break
                 
         return res
@@ -156,12 +158,12 @@ def main(file1,file2,bg1,bg2,args):
     wb1 = xlrd.open_workbook(file1)
     sheet1 = wb1.sheet_by_index(0)
     print ("--sheet1 rows:",sheet1.nrows)
-    print ("--sheet1 cols:",sheet1.ncols)
+    #print ("--sheet1 cols:",sheet1.ncols)
 
     wb2 = xlrd.open_workbook(file2)
     sheet2 = wb2.sheet_by_index(0)
     print ("--sheet2 rows:",sheet2.nrows)
-    print ("--sheet2 cols:",sheet2.ncols)
+    #print ("--sheet2 cols:",sheet2.ncols)
 
     # -- Створюємо дескриптори діапазонів для кожного листа
 
@@ -172,36 +174,36 @@ def main(file1,file2,bg1,bg2,args):
     d1 = range1.get_dict()
     d2 = range2.get_dict()
 
-    print ('--Dict1:',d1)
-    print ('--Dict2:',d2)
+    #print ('--Dict1:',d1)
+    #print ('--Dict2:',d2)
     
     # Дивимось результат
-    range1.dump()
+    #range1.dump()
 
     # -- Пошук відсутніх у другому
     absent2 = utl.get_absent(d1,d2)  # -- Список номерів відсутніх рядків
-    print ('absent2:',absent2)
+    #print ('absent2:',absent2)
 
     # -- Пошук у першому
     absent1 = utl.get_absent(d2,d1)
-    print ('absent1:',absent1)
+    #print ('absent1:',absent1)
 
     # -- Виписка номерів рядків першого файла ключі яких є у другому файлі
     common1 = utl.get_common(d1,d2)
-    print('Common1:',common1)
+    #print('Common1:',common1)
 
     # -- Виписка номерів рядків другого файла ключі яких є у першому файлі
     common2 = utl.get_common(d2,d1)
-    print('Common2:',common2)    
+    #print('Common2:',common2)    
 
 
     
     # -- Побудова результату
     '''
     1. Створити workbook
-    2. Створити sheet
+    2. Створити sheets
     3. Переписати заголовок із базового sheeh
-    4. Виписати рядки із базового sheet
+    4,5,6 Виписати рядки із базового sheet
 
     '''
     exgen = result.ExcelGen(range1,range2)
@@ -244,9 +246,6 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-
-    print ('Args:',args)
-    print('Args type:',type(args))
 
     # ---- *** Додати валідацію аргументів ****
         
