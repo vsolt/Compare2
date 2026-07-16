@@ -243,13 +243,13 @@ def main(file1,file2,bg1,bg2,args):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Порівнює вказані колонки із дв ох ексель файлів та видає результат у залежності від режиму порівняння')
+    parser = argparse.ArgumentParser(description='Порівнює вказані колонки із двох ексель файлів та видає результат у залежності від режиму порівняння')
     parser.add_argument("file_1_name",help="Перший файл")
     parser.add_argument("file_2_name",help="Другий файл")
     parser.add_argument("col_file_1",help="Початкова клітинка першого файла") 
     parser.add_argument("col_file_2",help="Початкова клітинка другого файла")  
 
-    parser.add_argument("-l","--lines",help="Обмеження числа зчитуваних рядків вхідних файлів")
+    parser.add_argument("-l","--lines",help="Обмеження числа зчитуваних рядків вхідних файлів (для тестування)")
     
     args = parser.parse_args()
 
