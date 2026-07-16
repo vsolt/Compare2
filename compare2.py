@@ -7,7 +7,7 @@ import types
 import utl
 import result
 
-ver = "0.0"
+ver = "0.1"
 
 
 args = None  # -- Для збереження оргументів командного рядка глобально
@@ -157,13 +157,12 @@ def main(file1,file2,bg1,bg2,args):
     
     wb1 = xlrd.open_workbook(file1)
     sheet1 = wb1.sheet_by_index(0)
-    print ("--sheet1 rows:",sheet1.nrows)
-    #print ("--sheet1 cols:",sheet1.ncols)
+    console("Число рядків у першому файлі:%s" % sheet1.nrows)
 
     wb2 = xlrd.open_workbook(file2)
     sheet2 = wb2.sheet_by_index(0)
-    print ("--sheet2 rows:",sheet2.nrows)
-    #print ("--sheet2 cols:",sheet2.ncols)
+    #rows2 = sheet2.nrows
+    console("Число рядків у другому файлі:%s" % sheet2.nrows)    
 
     # -- Створюємо дескриптори діапазонів для кожного листа
 
@@ -174,8 +173,9 @@ def main(file1,file2,bg1,bg2,args):
     d1 = range1.get_dict()
     d2 = range2.get_dict()
 
-    #print ('--Dict1:',d1)
+    #print ('--Dict1:',d1)    
     #print ('--Dict2:',d2)
+
     
     # Дивимось результат
     #range1.dump()
@@ -223,10 +223,17 @@ def main(file1,file2,bg1,bg2,args):
     exgen.add_sheet_rows(sheet1,2,common1,rep=True)
 
     # -- Виписуємо  рядки другого файла знайдені за ключами першого файла
-    console(u'Присутніх у обох файлах:%s' % len(common2))    
-    exgen.add_sheet_rows(sheet2,3,common2,rep=True)
+    #console(u'Присутніх у обох файлах:%s' % len(common2))    
+    #exgen.add_sheet_rows(sheet2,3,common2,rep=True)
 
     # -- Виписуємо рядки першого файла спільні наявними ключами к 2му
+    rep1  = utl.get_stat_repeated(d1)
+    rep2  = utl.get_stat_repeated(d2)    
+
+    console(u'Повторних у першому файлі:%s' % rep1)
+    console(u'Повторних у другому файлі:%s' % rep2)    
+
+
     
 
     exgen.save('out.xls')
