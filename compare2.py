@@ -18,13 +18,13 @@ def console(utf_message):
     utf_message : Рядок у кодуванні utf-8
     ver-0.1
     '''
-    if os.name == 'nt':
-        res = utf_message.replace(u'і',u'i')
-        res = res.replace(u'І',u'I')
-        res = res.encode('cp866')
-    else:
-        res = utf_message
-    print (res)
+    #if os.name == 'nt':
+    #    res = utf_message.replace(u'і',u'i')
+    #    res = res.replace(u'І',u'I')
+    #    res = res.encode('cp866')
+    #else:
+    #    res = utf_message
+    print (utf_message)
 
 
 def validate_args(file1,file2):
